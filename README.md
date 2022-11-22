@@ -1,2 +1,3 @@
-# GenericWebServicesLayer
-A generic web services layer, using Alamofire
+# GenericNetworkingLayer
+
+A description of this package.
