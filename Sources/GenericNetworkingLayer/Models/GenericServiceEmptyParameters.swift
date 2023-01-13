@@ -8,4 +8,9 @@
 import Foundation
 
 public class GenericServiceEmptyParameters: Codable {
+
+    // MARK: - INIT
+    public init() {
+    }
+
 }
