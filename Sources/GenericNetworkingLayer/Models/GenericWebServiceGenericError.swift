@@ -7,10 +7,10 @@
 
 import Foundation
 
-public enum GenericWebServiceGenericError<ErrorModelType: Codable>: Error {
+public enum GenericWebServiceGenericError<ErrorModelType: Codable & Sendable>: Error {
     case invalidUrl
     case serviceFailure(statusCode: Int)
-    case unknow(error: Error)
+    case unknown(error: Error)
     case decodeError(error: Error)
     case modelError(model: ErrorModelType)
 }

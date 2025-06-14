@@ -34,10 +34,10 @@ final public class GenericWebServiceRequestAdapter: GenericWebServiceRequestAdap
             .eraseToAnyPublisher()
         }
         return AF.request(requestUrl,
-                          method: request.method,
+                          method: request.method.alamofireEquivalent,
                           parameters: parameters,
                           encoder: getParameterEncoder(request: request),
-                          headers: request.headers,
+                          headers: request.headers.adaptToAlamofireType(),
                           requestModifier: { request in
             request.cachePolicy = .reloadIgnoringCacheData
         })
@@ -73,12 +73,10 @@ final public class GenericWebServiceRequestAdapter: GenericWebServiceRequestAdap
 
     private func getParameterEncoder(request: GenericWebServiceRequestable) -> ParameterEncoder {
         switch request.method {
-        case .get, .head, .delete:
+        case .get:
             return URLEncodedFormParameterEncoder(destination: .methodDependent)
-        case .post, .put:
+        case .post, .put, .patch, .delete:
             return JSONParameterEncoder.default
-        default:
-            return URLEncodedFormParameterEncoder(destination: .methodDependent)
         }
     }
 
