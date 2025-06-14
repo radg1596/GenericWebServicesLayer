@@ -9,7 +9,7 @@ import Alamofire
 import Foundation
 import Combine
 
-final public class GenericWebServiceRequestAdapter: GenericWebServiceRequestAdaptable {
+final public class GenericWebServiceRequestAdapter: GenericWebServiceRequestAdaptable, Sendable {
 
     // MARK: - PROPERTIES
     private let constants = GenericWebServiceRequestAdapterConstants()
@@ -25,8 +25,8 @@ final public class GenericWebServiceRequestAdapter: GenericWebServiceRequestAdap
     }
 
     // MARK: - METHODS
-    public func fetch<ParametersType>(request: GenericWebServiceRequestable,
-                               parameters: ParametersType) -> AnyPublisher<Data, Error>
+    public func fetch<ParametersType: Sendable>(request: GenericWebServiceRequestable,
+                                                parameters: ParametersType) -> AnyPublisher<Data, Error>
                                where ParametersType : Encodable {
         guard let requestUrl = getUrlForRequest(request: request) else {
             return Fail(outputType: Data.self,
