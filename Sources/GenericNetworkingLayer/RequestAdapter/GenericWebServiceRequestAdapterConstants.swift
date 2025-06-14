@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class GenericWebServiceRequestAdapterConstants {
+final class GenericWebServiceRequestAdapterConstants: Sendable {
 
     // MARK: - PROPERTIES
     let successStatusRange = 200..<300
