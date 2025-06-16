@@ -7,6 +7,6 @@
 
 import Foundation
 
-final public class GenericWebServiceGenericErrorModel: Codable {
+final public class GenericWebServiceGenericErrorModel: Codable & Sendable {
     let message: String
 }

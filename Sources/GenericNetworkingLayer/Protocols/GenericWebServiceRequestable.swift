@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public protocol GenericWebServiceRequestable: AnyObject {
+public protocol GenericWebServiceRequestable {
     var baseUrl: String { get }
     var endPointPath: String { get }
     var method: GenericHTTPMethod { get }
