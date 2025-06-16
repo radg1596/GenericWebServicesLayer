@@ -14,23 +14,19 @@ final public class GenericWebServiceRequestAdapter: GenericWebServiceRequestAdap
     // MARK: - PROPERTIES
     private let constants = GenericWebServiceRequestAdapterConstants()
 
-    // MARK: - ERROR
-    enum InternalError: Error {
-        case invalidUrl
-        case invalidData
-    }
-
     // MARK: - INIT
     public init() {
     }
 
     // MARK: - METHODS
-    public func fetch<ParametersType: Sendable>(request: GenericWebServiceRequestable,
-                                                parameters: ParametersType) -> AnyPublisher<Data, Error>
+    public func fetch<ParametersType: Sendable,
+                      ErrorType: Codable & Sendable>(request: GenericWebServiceRequestable,
+                                                     parameters: ParametersType,
+                                                     errorType: ErrorType.Type) -> AnyPublisher<Data, Error>
                                where ParametersType : Encodable {
         guard let requestUrl = getUrlForRequest(request: request) else {
             return Fail(outputType: Data.self,
-                        failure: InternalError.invalidUrl)
+                        failure: GenericWebServiceGenericError<ErrorType>.invalidUrl)
             .eraseToAnyPublisher()
         }
         return AF.request(requestUrl,
@@ -44,15 +40,20 @@ final public class GenericWebServiceRequestAdapter: GenericWebServiceRequestAdap
         .validate(statusCode: self.constants.successStatusRange)
         .validate(contentType: self.constants.contentTypeValidation)
         .publishData()
-        .tryMap(mapResponseData(alamofireResponse:))
+        .tryMap { try self.mapResponseData(alamofireResponse: $0, errorType: errorType) }
         .eraseToAnyPublisher()
     }
 
     // MARK: - MAP
-    private func mapResponseData(alamofireResponse: (DataResponse<Data, AFError>)) throws -> Data {
+    private func mapResponseData<ErrorType: Codable & Sendable>(alamofireResponse: (DataResponse<Data, AFError>), errorType: ErrorType.Type) throws -> Data {
         switch alamofireResponse.result {
-        case .failure:
-            throw InternalError.invalidData
+        case .failure(let error):
+            switch error {
+            case AFError.responseValidationFailed(reason: .unacceptableStatusCode(let code)):
+                throw GenericWebServiceGenericError<ErrorType>.serviceFailure(statusCode: code)
+            default:
+                throw error
+            }
         case .success(let data):
             return data
         }
